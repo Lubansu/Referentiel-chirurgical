@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Référentiel Chirurgical Mobile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3c72 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .back-button.show {
+            display: block;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Navigation tabs corrigée pour 2 lignes sur mobile */
+        .nav-tabs {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: 1fr 1fr;
+            gap: 0;
+            min-height: 80px;
+        }
+
+        .nav-tab {
+            padding: 8px 6px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s ease;
+            border-right: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Suppression des bordures pour les derniers éléments */
+        .nav-tab:nth-child(4) {
+            border-right: none;
+        }
+
+        .nav-tab:nth-child(5), .nav-tab:nth-child(6), .nav-tab:nth-child(7), .nav-tab:nth-child(8) {
+            border-bottom: none;
+        }
+
+        .nav-tab:nth-child(8) {
+            border-right: none;
+        }
+
+        .nav-tab.active {
+            background: #2c5aa0;
+            color: white;
+        }
+
+        .nav-tab.home-tab {
+            background: #17a2b8;
+            color: white;
+            font-weight: 600;
+        }
+
+        .nav-tab.home-tab:hover {
+            background: #138496;
+        }
+
+        .nav-tab:hover:not(.active):not(.home-tab) {
+            background: #e9ecef;
+            color: #2c5aa0;
+        }
+
+        .content {
+            padding: 20px;
+            max-height: calc(100vh - 240px);
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border-left: 4px solid #2c5aa0;
+        }
+
+        .card h3 {
+            color: #2c5aa0;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .card h3::before {
+            content: "▶";
+            margin-right: 8px;
+            font-size: 0.8rem;
+        }
+
+        .technique-card {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: none;
+        }
+
+        .technique-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .technique-card h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .technique-card h3::before {
+            content: "🏥";
+            margin-right: 10px;
+        }
+
+        .technique-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .mini-stat {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .mini-stat-value {
+            font-weight: bold;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .indications-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .indications-list h4 {
+            color: #2c5aa0;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .indications-list ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .indications-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .indications-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .technique-step {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #2c5aa0;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .technique-step h4 {
+            color: #2c5aa0;
+            margin: 10px 0 10px 0;
+            font-size: 1rem;
+        }
+
+        .video-container {
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .image-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .image-caption {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .complications {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .complications h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .reference {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .reference h4 {
+            color: #0066cc;
+            margin-bottom: 8px;
+        }
+
+        .reference p {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .advantages {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .advantage-item {
+            background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: #2c5aa0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 10px 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -21px;
+            top: 15px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #2c5aa0;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #2c5aa0;
+        }
+
+        .timeline-time {
+            font-weight: bold;
+            color: #2c5aa0;
+            font-size: 0.9rem;
+        }
+
+        .timeline-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .alert-info {
+            background: #cce7ff;
+            border-left: 4px solid #0066cc;
+            color: #004085;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        @media (max-width: 480px) {
+            .nav-tab {
+                font-size: 0.65rem;
+                padding: 6px 4px;
+            }
+            
+            .content {
+                padding: 15px;
+                max-height: calc(100vh - 260px);
+            }
+            
+            .stats, .technique-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .coming-soon {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .coming-soon h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .coming-soon h3::before {
+            content: "🚧";
+            margin-right: 10px;
+        }
+
+        /* Section bienvenue avec arrière-plan corrigé */
+        .welcome-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+            /* Ajout d'un pattern de fallback si l'image n'est pas trouvée */
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+        }
+        
+        /* Style pour quand l'image se charge */
+        .welcome-section.has-image {
+            background-image: 
+                linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%),
+                url('image6.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .welcome-section h2 {
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .welcome-section p {
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .version-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 10px;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-button" id="backButton" onclick="goHome()">← Retour</button>
+            <h1>🏥 Référentiel Chirurgical</h1>
+            <p id="headerSubtitle">Techniques Mini-Invasives</p>
+        </div>
+
+        <!-- Navigation pour Canal Carpien - Organisée sur 2 lignes -->
+        <div class="nav-tabs" id="carpienTabs" style="display: none;">
+            <!-- Première ligne -->
+            <button class="nav-tab active" onclick="showCarpienSection('overview')">Vue d'ensemble</button>
+            <button class="nav-tab" onclick="showCarpienSection('indications')">Indications</button>
+            <button class="nav-tab" onclick="showCarpienSection('technique')">Technique</button>
+            <button class="nav-tab" onclick="showCarpienSection('video')">Vidéo</button>
+            <!-- Deuxième ligne -->
+            <button class="nav-tab" onclick="showCarpienSection('images')">Images</button>
+            <button class="nav-tab" onclick="showCarpienSection('results')">Résultats</button>
+            <button class="nav-tab" onclick="showCarpienSection('reference')">Article</button>
+            <button class="nav-tab home-tab" onclick="goHome()">← Accueil</button>
+        </div>
+
+        <div class="content">
+            <!-- Page d'accueil -->
+            <div id="home" class="section active">
+                <div class="welcome-section" id="welcomeSection">
+                    <h2>Bienvenue dans le Référentiel Chirurgical</h2>
+                    <p>Votre guide mobile des techniques chirurgicales mini-invasives modernes</p>
+                    <span class="version-badge">Version 1.0</span>
+                </div>
+
+                <div class="card">
+                    <h3>Techniques Disponibles</h3>
+                    <p>Sélectionnez une technique pour accéder au protocole complet, vidéos et documentation.</p>
+                </div>
+
+                <!-- Première technique : Canal Carpien -->
+                <div class="technique-card" onclick="openCanalCarpien()">
+                    <h3>Libération Échoguidée du Canal Carpien</h3>
+                    <p>Technique ultra mini-invasive de section percutanée du rétinaculum des fléchisseurs sous contrôle échographique continu.</p>
+                    
+                    <div class="technique-stats">
+                        <div class="mini-stat">
+                            <span class="mini-stat-value">0,1-0,5cm</span>
+                            <span>Incision</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value">5,8min</span>
+                            <span>Durée</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value">J+14</span>
+                            <span>Reprise</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value">0%</span>
+                            <span>Complications</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Techniques à venir -->
+                <div class="coming-soon">
+                    <h3>Doigt à Ressaut Échoguidé</h3>
+                    <p>Technique percutanée de libération des poulies - Disponible prochainement</p>
+                </div>
+
+                <div class="coming-soon">
+                    <h3>Aponévrotomie Échoguidée</h3>
+                    <p>Traitement de la maladie de Dupuytren - En développement</p>
+                </div>
+
+                <div class="coming-soon">
+                    <h3>Autres Techniques</h3>
+                    <p>D'autres protocoles seront ajoutés régulièrement</p>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>À propos :</strong> Ce référentiel est en cours de développement. De nouvelles techniques mini-invasives seront ajoutées régulièrement.
+                </div>
+            </div>
+
+            <!-- Sections Canal Carpien -->
+            <div id="carpien-overview" class="section">
+                <div class="card">
+                    <h3>Échochirurgie du Canal Carpien</h3>
+                    <p>Technique mini-invasive de libération percutanée du rétinaculum des fléchisseurs sous contrôle échographique continu.</p>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-value">0,1-0,5cm</span>
+                            <span class="stat-label">Taille incision</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">5,8min</span>
+                            <span class="stat-label">Durée moyenne</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">J+14</span>
+                            <span class="stat-label">Reprise activité</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">0%</span>
+                            <span class="stat-label">Complications</span>
+                        </div>
+                    </div>
+
+                    <div class="advantages">
+                        <div class="advantage-item">✓ Ultra mini-invasif (10x plus petit qu'endoscopie)</div>
+                        <div class="advantage-item">✓ Anesthésie locale uniquement</div>
+                        <div class="advantage-item">✓ Ambulatoire, sortie dans l'heure</div>
+                        <div class="advantage-item">✓ Contrôle échographique continu</div>
+                        <div class="advantage-item">✓ Récupération plus rapide</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Innovation :</strong> Cette technique représente une évolution majeure par rapport aux approches chirurgicales classiques (ouverte) et endoscopiques.
+                </div>
+            </div>
+
+            <div id="carpien-indications" class="section">
+                <div class="card">
+                    <h3>Indications</h3>
+                    
+                    <div class="indications-list">
+                        <h4>Indications Primaires</h4>
+                        <ul>
+                            <li>Échec du traitement médical conservateur</li>
+                            <li>Syndrome du canal carpien sévère d'emblée</li>
+                            <li>Déficit moteur installé ou en voie d'installation</li>
+                            <li>Troubles sensitifs persistants invalidants</li>
+                            <li>Forme récidivante après infiltration</li>
+                        </ul>
+                    </div>
+
+                    <div class="indications-list">
+                        <h4>Critères Échographiques</h4>
+                        <ul>
+                            <li>Surface de section transverse du nerf médian > 13 mm²</li>
+                            <li>Bombement du rétinaculum des fléchisseurs</li>
+                            <li>Modification de l'échogénicité du nerf médian</li>
+                            <li>Épaississement du rétinaculum</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="complications">
+                    <h4>⚠️ Contre-indications</h4>
+                    <ul>
+                        <li>Variantes anatomiques dangereuses non contrôlables</li>
+                        <li>Infection locale</li>
+                        <li>Troubles de la coagulation non corrigés</li>
+                        <li>Anatomie non favorable à l'échographie</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="carpien-technique" class="section">
+                <div class="card">
+                    <h3>Protocole Opératoire</h3>
+                    
+                    <div class="technique-step">
+                        <div class="step-number">1</div>
+                        <h4>Préparation</h4>
+                        <p>Patient en décubitus dorsal, sans garrot. Conditions d'asepsie strictes : désinfection 5 temps, champs stériles, matériel stérilisé.</p>
+                    </div>
+
+                    <div class="technique-step">
+                        <div class="step-number">2</div>
+                        <h4>Repérage Échographique</h4>
+                        <p>Identification de la zone de sécurité entre artère ulnaire et nerf médian. Recherche de variantes anatomiques de la branche thénarienne.</p>
+                    </div>
+
+                    <div class="technique-step">
+                        <div class="step-number">3</div>
+                        <h4>Anesthésie</h4>
+                        <p>Anesthésie locale sous-cutanée au pli de flexion. Hydrodissection avec 10cc de xylocaïne 1% pour préparer le tunnel.</p>
+                    </div>
+
+                    <div class="technique-step">
+                        <div class="step-number">4</div>
+                        <h4>Incision et Mise en Place</h4>
+                        <p>Incision punctiforme (1-2mm) à la peau. Introduction de la lame crochet sous le rétinaculum sous contrôle échographique.</p>
+                    </div>
+
+                    <div class="technique-step">
+                        <div class="step-number">5</div>
+                        <h4>Section du Rétinaculum</h4>
+                        <p>Section rétrograde progressive du rétinaculum sous contrôle échographique continu, en restant à distance du nerf médian.</p>
+                    </div>
+
+                    <div class="technique-step">
+                        <div class="step-number">6</div>
+                        <h4>Suites Postopératoires</h4>
+                        <p>Pansement compressif. Sortie dans l'heure. Consultation de contrôle J+6. Cicatrisation complète dans tous les cas.</p>
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-time">J+3</div>
+                        <div class="timeline-desc">Retrait du pansement</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">J+6</div>
+                        <div class="timeline-desc">Consultation postopératoire</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">J+14</div>
+                        <div class="timeline-desc">Reprise des activités</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="carpien-video" class="section">
+                <div class="card">
+                    <h3>Vidéo de la Technique</h3>
+                    
+                    <div class="video-container">
+                        <video controls width="100%" style="border-radius: 8px;" preload="metadata">
+                            <source src="Chirurgie du canal carpien au cabinet percutanée sous échographie et anesthésie locale.mp4" type="video/mp4">
+                            Votre navigateur ne supporte pas la lecture vidéo.
+                        </video>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>Contrôles vidéo :</strong> Utilisez les contrôles pour lire, mettre en pause et ajuster le volume. La vidéo se charge automatiquement depuis le dossier Canal Carpien.
+                    </div>
+                </div>
+            </div>
+
+            <div id="carpien-images" class="section">
+                <div class="card">
+                    <h3>Iconographie</h3>
+                    
+                    <div class="image-gallery">
+                        <div class="image-item">
+                            <img src="image1.jpg" alt="Mesure CSA" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIDEgTm9uIERpc3BvbmlibGU8L3RleHQ+PC9zdmc+'" />
+                            <div class="image-caption">Mesure de la surface de section transverse du nerf médian en échographie</div>
+                        </div>
+                        
+                        <div class="image-item">
+                            <img src="image2.jpg" alt="Repérage" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIDIgTm9uIERpc3BvbmlibGU8L3RleHQ+PC9zdmc+'" />
+                            <div class="image-caption">Repérage échographique et visualisation de la zone de sécurité</div>
+                        </div>
+                        
+                        <div class="image-item">
+                            <img src="image3.jpg" alt="Matériel" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIDMgTm9uIERpc3BvbmlibGU8L3RleHQ+PC9zdmc+'" />
+                            <div class="image-caption">Matériel utilisé pour l'échochirurgie du rétinaculum</div>
+                        </div>
+                        
+                        <div class="image-item">
+                            <img src="image4.jpg" alt="Technique" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIDQgTm9uIERpc3BvbmlibGU8L3RleHQ+PC9zdmc+'" />
+                            <div class="image-caption">Lame en place avec correspondance échographique</div>
+                        </div>
+                        
+                        <div class="image-item">
+                            <img src="image5.jpg" alt="Résultat" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIDUgTm9uIERpc3BvbmlibGU8L3RleHQ+PC9zdmc+'" />
+                            <div class="image-caption">Aspect clinique postopératoire immédiat</div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Images :</strong> Les images s'affichent automatiquement si elles sont nommées image1.jpg à image5.jpg dans le dossier. Si elles n'apparaissent pas, vérifiez les noms des fichiers et leur emplacement.
+                    </div>
+                </div>
+            </div>
+
+            <div id="carpien-results" class="section">
+                <div class="card">
+                    <h3>Résultats Cliniques</h3>
+                    
+                    <div class="alert alert-success">
+                        <strong>Série de 129 patients</strong> traités consécutivement par échochirurgie percutanée avec amélioration significative dans tous les cas.
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-value">3,3→1,3</span>
+                            <span class="stat-label">Score Boston (6 mois)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">100%</span>
+                            <span class="stat-label">Section complète IRM</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">90%</span>
+                            <span class="stat-label">Décompression IRM</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">23,2min</span>
+                            <span class="stat-label">Temps d'occupation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Comparaison avec Techniques Classiques</h3>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Technique</th>
+                            <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Incision</th>
+                            <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Reprise</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #dee2e6;">Chirurgie ouverte</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">4-5 cm</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">30 jours</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #dee2e6;">Mini-open</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">2 cm</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">15 jours</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #dee2e6;">Endoscopie</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">1-2 cm</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">10-15 jours</td>
+                        </tr>
+                        <tr style="background: #e7f3ff;">
+                            <td style="padding: 10px; border: 1px solid #dee2e6;"><strong>Échochirurgie</strong></td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;"><strong>0,1-0,5 cm</strong></td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;"><strong>4-14 jours</strong></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="complications">
+                    <h4>⚠️ Complications Rapportées</h4>
+                    <p><strong>Dans cette série de 200+ interventions :</strong> Aucune complication majeure ou mineure observée.</p>
+                    <p><strong>Complications théoriques :</strong> Lésion nerveuse, vasculaire, infection, récidive (très rares avec technique échoguidée).</p>
+                </div>
+            </div>
+
+            <div id="carpien-reference" class="section">
+                <div class="reference">
+                    <h4>📄 Article de Référence</h4>
+                    <p><strong>Titre :</strong> Prise en charge du syndrome du canal carpien: de l'échographie diagnostique à la libération percutanée sous échographie</p>
+                    <p><strong>Auteurs :</strong> David Petrover, Pascal Richette</p>
+                    <p><strong>Journal :</strong> Revue du Rhumatisme 85 (2018) 243–250</p>
+                    <p><strong>DOI :</strong> https://doi.org/10.1016/j.rhum.2017.09.012</p>
+                </div>
+
+                <div class="card">
+                    <h3>Résumé de l'Article</h3>
+                    <p>Le syndrome du canal carpien représente le syndrome canalaire neurologique le plus fréquemment diagnostiqué. L'échographie a pris une place importante dans le diagnostic et la prise en charge, permettant une approche mini-invasive révolutionnaire.</p>
+                    
+                    <div class="alert alert-info">
+                        <strong>Points Clés :</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>L'échochirurgie permet un abord 10 fois plus petit que l'endoscopie</li>
+                            <li>Technique ultra-mini-invasive sous contrôle échographique</li>
+                            <li>Section du rétinaculum des fléchisseurs par voie percutanée</li>
+                            <li>Résultats cliniques au moins équivalents aux techniques classiques</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Innovation Technique</h3>
+                    <p>Cette approche représente un changement de paradigme dans le traitement chirurgical du syndrome du canal carpien, combinant :</p>
+                    <ul style="margin: 15px 0; padding-left: 20px;">
+                        <li>La précision du guidage échographique</li>
+                        <li>Le caractère ultra mini-invasif</li>
+                        <li>La sécurité du contrôle visuel continu</li>
+                        <li>La rapidité d'exécution</li>
+                        <li>La simplicité des suites postopératoires</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>Accès à l'article complet :</strong> Le PDF de l'article original est disponible dans le dossier "Canal Carpien" pour consultation détaillée.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentView = 'home';
+
+        function showCarpienSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById('carpien-' + sectionId).classList.add('active');
+            
+            // Add active class to the correct tab
+            const sectionToTabMap = {
+                'overview': 0,
+                'indications': 1,
+                'technique': 2,
+                'video': 3,
+                'images': 4,
+                'results': 5,
+                'reference': 6
+            };
+            
+            const tabIndex = sectionToTabMap[sectionId];
+            if (tabIndex !== undefined) {
+                tabs[tabIndex].classList.add('active');
+            }
+        }
+
+        function openCanalCarpien() {
+            currentView = 'carpien';
+            
+            // Hide home section
+            document.getElementById('home').classList.remove('active');
+            
+            // Show carpien tabs and first section
+            document.getElementById('carpienTabs').style.display = 'grid';
+            document.getElementById('carpien-overview').classList.add('active');
+            
+            // Update header
+            document.getElementById('headerSubtitle').textContent = 'Canal Carpien - Libération Échoguidée';
+            document.getElementById('backButton').classList.add('show');
+            
+            // Activate first tab
+            document.querySelector('#carpienTabs .nav-tab').classList.add('active');
+        }
+
+        function goHome() {
+            currentView = 'home';
+            
+            // Hide all carpien sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show home section
+            document.getElementById('home').classList.add('active');
+            
+            // Hide carpien tabs
+            document.getElementById('carpienTabs').style.display = 'none';
+            
+            // Update header
+            document.getElementById('headerSubtitle').textContent = 'Techniques Mini-Invasives';
+            document.getElementById('backButton').classList.remove('show');
+            
+            // Remove active from tabs
+            const tabs = document.querySelectorAll('.nav-tab:not(.home-tab)');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure home is shown initially
+            goHome();
+            
+            // Add smooth scrolling for better UX
+            document.querySelector('.content').style.scrollBehavior = 'smooth';
+            
+            // Tenter de charger l'image d'arrière-plan
+            const img = new Image();
+            img.onload = function() {
+                document.getElementById('welcomeSection').classList.add('has-image');
+            };
+            img.onerror = function() {
+                console.log('Image6.jpg non trouvée, utilisation du dégradé de fallback');
+            };
+            img.src = 'image6.jpg';
+        });
+
+        // Touch gestures for navigation within carpien sections
+        let startX = 0;
+        let currentSectionIndex = 0;
+        const carpienSections = ['overview', 'indications', 'technique', 'video', 'images', 'results', 'reference'];
+
+        document.addEventListener('touchstart', function(e) {
+            if (currentView === 'carpien') {
+                startX = e.touches[0].clientX;
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (currentView === 'carpien') {
+                const endX = e.changedTouches[0].clientX;
+                const diffX = startX - endX;
+                
+                if (Math.abs(diffX) > 50) {
+                    if (diffX > 0 && currentSectionIndex < carpienSections.length - 1) {
+                        currentSectionIndex++;
+                        showCarpienSection(carpienSections[currentSectionIndex]);
+                    } else if (diffX < 0 && currentSectionIndex > 0) {
+                        currentSectionIndex--;
+                        showCarpienSection(carpienSections[currentSectionIndex]);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
